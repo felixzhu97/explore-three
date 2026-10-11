@@ -21,17 +21,23 @@ endlegend
 
 note as N_LAYERS
   components → infra/three → domain/model
-  Three.js bootstrap (createGlobe, land, arcs)
-  lives in src/infra/three — not on this diagram.
+  Mesh/Group (FlightArc, GlobeRoot, …)
+  + materials live in src/infra/three —
+  not on this diagram.
   Preferred Terms: docs/Glossary.md
 end note
 
 package "Geography" as pkg_geo {
+  class SpherePoint <<ValueObject>> {
+    +x: number
+    +y: number
+    +z: number
+  }
   class GeoCoord <<ValueObject>> {
     +lat: number
     +lon: number
     --
-    +projectToVector3(radius)
+    +projectToSpherePoint(radius)
   }
 }
 
@@ -39,6 +45,9 @@ package "Route" as pkg_route {
   class FlightRoute <<Entity>> {
     +origin: GeoCoord
     +destination: GeoCoord
+    --
+    +{static} of(origin, destination)
+    +endpoints()
   }
   class DEFAULT_ROUTES <<ValueObject>> {
     +routes: FlightRoute[]
@@ -46,13 +55,17 @@ package "Route" as pkg_route {
 }
 
 package "Theme" as pkg_theme {
-  class ThemeType <<ValueObject>> {
+  class ThemeId <<ValueObject>> {
     +bright
     +tech
   }
-  class ThemeConfig <<ValueObject>> {
-    +type: ThemeType
-    +dotShader
+  class RouteColor <<ValueObject>> {
+    +r: number
+    +g: number
+    +b: number
+  }
+  class ThemeAppearance <<ValueObject>> {
+    +type: ThemeId
     +lightConfig
     +buttonStroke: String
     +sourceUrl: String
@@ -63,11 +76,14 @@ package "Theme" as pkg_theme {
   class TECH_COLORS <<ValueObject>>
 }
 
+GeoCoord --> SpherePoint : projectToSpherePoint
 FlightRoute --> GeoCoord : origin
 FlightRoute --> GeoCoord : destination
 DEFAULT_ROUTES "1" *-- "0..*" FlightRoute
-ThemeConfig --> ThemeType
-BRIGHT_THEME --> ThemeConfig
-TECH_THEME --> ThemeConfig
+ThemeAppearance --> ThemeId
+BRIGHT_THEME --> ThemeAppearance
+TECH_THEME --> ThemeAppearance
+BRIGHT_COLORS --> RouteColor
+TECH_COLORS --> RouteColor
 
 @enduml

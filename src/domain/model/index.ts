@@ -1,6 +1,7 @@
+export { SpherePoint } from './SpherePoint';
 export { GeoCoord } from './GeoCoord';
 export { FlightRoute, DEFAULT_ROUTES } from './FlightRoute';
-export type { ThemeType, ThemeConfig } from './Theme';
+export type { ThemeId, ThemeAppearance, RouteColor } from './Theme';
 export {
   BRIGHT_THEME,
   TECH_THEME,

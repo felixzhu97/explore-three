@@ -28,16 +28,20 @@ Container_Boundary(ui, "React UI") {
 }
 
 Container_Boundary(domain, "Domain Model (src/domain/model)") {
-    Component(geo, "GeoCoord", "ValueObject", "projectToVector3")
+    Component(sphere, "SpherePoint", "ValueObject", "球面笛卡尔点")
+    Component(geo, "GeoCoord", "ValueObject", "projectToSpherePoint")
     Component(route, "FlightRoute", "Entity", "origin / destination")
     Component(routes, "DEFAULT_ROUTES", "Const", "六条默认航线")
-    Component(theme, "Theme", "ValueObject", "BRIGHT_THEME / TECH_THEME / colors")
+    Component(theme, "ThemeAppearance", "ValueObject", "BRIGHT_THEME / TECH_THEME / RouteColor")
 }
 
 Container_Boundary(infra, "Infra Three (src/infra/three)") {
-    Component(create_globe, "createGlobe", "Function", "场景引导与 dispose")
-    Component(land, "addLandDots", "Function", "陆地蒙版 → 点")
-    Component(arc, "createArc / createMarker", "Function", "飞线与端点")
+    Component(create_globe, "createGlobe", "Function", "Scene / Camera / Renderer / rAF")
+    Component(root, "GlobeRoot", "Group", "灯光 / 球体 / 子对象")
+    Component(land, "LandDotsGroup", "Group", "陆地蒙版 → 点")
+    Component(arc, "FlightArc", "Mesh", "飞线 tube")
+    Component(marker, "RouteMarker", "Mesh", "端点 disc")
+    Component(mats, "materials", "Module", "Dot / Arc / Marker shaders")
     Component(cfg, "config defaults", "Module", "半径 / tube / 贴图")
 }
 
@@ -58,13 +62,17 @@ Rel(globe_dark, theme, "读主题常量")
 Rel(globe_view, gsap, "u_maxExtrusion tween")
 Rel(globe_dark, gsap, "u_maxExtrusion tween")
 
-Rel(create_globe, land, "addLandDots")
-Rel(create_globe, arc, "createArc")
-Rel(create_globe, cfg, "defaults")
-Rel(create_globe, routes, "DEFAULT_ROUTES")
-Rel(create_globe, theme, "ThemeConfig")
+Rel(create_globe, root, "new GlobeRoot")
+Rel(root, land, "LandDotsGroup")
+Rel(root, arc, "FlightArc")
+Rel(root, marker, "RouteMarker")
+Rel(root, mats, "shaders")
+Rel(root, cfg, "defaults")
+Rel(root, routes, "DEFAULT_ROUTES")
+Rel(root, theme, "ThemeAppearance")
 Rel(arc, route, "FlightRoute")
-Rel(arc, geo, "GeoCoord")
+Rel(marker, geo, "GeoCoord")
+Rel(geo, sphere, "SpherePoint")
 Rel(land, threejs, "Mesh")
 Rel(arc, threejs, "TubeGeometry")
 Rel(create_globe, threejs, "Scene / rAF")

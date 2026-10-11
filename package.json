@@ -2,12 +2,13 @@
   "name": "explore-three",
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.23.0",
   "description": "An interactive 3D globe visualization built with Three.js, featuring a twinkling star effect and animated flying lines connecting global locations.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "husky"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "gsap": "^3.12.7",
@@ -23,7 +24,6 @@
     "@types/three": "^0.175.0",
     "@vitejs/plugin-react": "^4.5.0",
     "autoprefixer": "^10.5.0",
-    "husky": "^9.1.7",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.6.0",

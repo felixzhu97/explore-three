@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { TECH_THEME, TECH_COLORS } from '../domain/model';
 import { createGlobe, type GlobeHandle } from '../infra/three';
 
@@ -20,7 +20,7 @@ export default function GlobeDarkTheme() {
     app = createGlobe(container, canvas, {
       theme: TECH_THEME,
       colors: TECH_COLORS,
-      lightPos: new THREE.Vector3(-50, 0, 60),
+      lightPos: new Vector3(-50, 0, 60),
       onHover(hit) {
         document.body.style.cursor = app.state.grabbing ? 'grabbing' : hit ? 'pointer' : 'default';
       },

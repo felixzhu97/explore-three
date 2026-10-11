@@ -1,56 +1,28 @@
-import * as THREE from 'three';
+/** Product theme id. */
+export type ThemeId = 'bright' | 'tech';
 
-/** 主题类型 */
-export type ThemeType = 'bright' | 'tech';
+/** RGB color in domain space (0..1). */
+export interface RouteColor {
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
+}
 
-/** 主题配置 */
-export interface ThemeConfig {
-  readonly type: ThemeType;
-  readonly dotShader: { vertex: string; fragment: string };
+/** Product appearance — no shaders / Three types. */
+export interface ThemeAppearance {
+  readonly type: ThemeId;
   readonly lightConfig: {
-    pointColor: number;
-    pointIntensity: number;
-    hemisphereColor: number;
-    hemisphereIntensity: number;
+    readonly pointColor: number;
+    readonly pointIntensity: number;
+    readonly hemisphereColor: number;
+    readonly hemisphereIntensity: number;
   };
   readonly buttonStroke: string;
   readonly sourceUrl: string;
 }
 
-/** 亮色主题 */
-export const BRIGHT_THEME: ThemeConfig = {
+export const BRIGHT_THEME: ThemeAppearance = {
   type: 'bright',
-  dotShader: {
-    vertex: `
-      uniform float u_time;
-      uniform float u_maxExtrusion;
-      varying vec3 vNormal;
-      void main() {
-        vNormal = normal;
-        vec3 pos = position;
-        if(u_maxExtrusion > 1.0) pos.xyz = pos.xyz * u_maxExtrusion + sin(u_time);
-        else pos.xyz = pos.xyz * u_maxExtrusion;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-      }
-    `,
-    fragment: `
-      uniform float u_time;
-      varying vec3 vNormal;
-      vec3 colorA = vec3(1.0, 0.55, 0.1);
-      vec3 colorB = vec3(1.0, 0.35, 0.65);
-      vec3 colorC = vec3(0.55, 0.15, 0.95);
-      vec3 colorD = vec3(0.25, 0.1, 0.75);
-      void main() {
-        vec3 color = vec3(0.0);
-        float t = clamp((vNormal.y + 1.0) * 0.5, 0.0, 1.0);
-        if (t < 0.33) color = mix(colorA, colorB, t / 0.33);
-        else if (t < 0.66) color = mix(colorB, colorC, (t - 0.33) / 0.33);
-        else color = mix(colorC, colorD, (t - 0.66) / 0.34);
-        color *= 1.3;
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `,
-  },
   lightConfig: {
     pointColor: 0xffffff,
     pointIntensity: 3,
@@ -61,33 +33,8 @@ export const BRIGHT_THEME: ThemeConfig = {
   sourceUrl: 'https://github.com/felixzhu97/three-explore',
 };
 
-/** 科技主题 */
-export const TECH_THEME: ThemeConfig = {
+export const TECH_THEME: ThemeAppearance = {
   type: 'tech',
-  dotShader: {
-    vertex: `
-      uniform float u_time;
-      uniform float u_maxExtrusion;
-      void main() {
-        vec3 pos = position;
-        if(u_maxExtrusion > 1.0) pos.xyz = pos.xyz * u_maxExtrusion + sin(u_time);
-        else pos.xyz = pos.xyz * u_maxExtrusion;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-      }
-    `,
-    fragment: `
-      uniform float u_time;
-      vec3 colorA = vec3(0.0, 0.8, 1.0);
-      vec3 colorB = vec3(0.0, 0.4, 0.8);
-      vec3 colorC = vec3(0.2, 1.0, 0.8);
-      void main() {
-        vec3 color = mix(colorA, colorB, abs(sin(u_time)));
-        color = mix(color, colorC, abs(sin(u_time * 0.7 + 1.57)) * 0.3);
-        color *= 1.2;
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `,
-  },
   lightConfig: {
     pointColor: 0x081b26,
     pointIntensity: 17,
@@ -98,22 +45,20 @@ export const TECH_THEME: ThemeConfig = {
   sourceUrl: 'https://github.com/felixzhu97/threejs-globe-stripe',
 };
 
-/** 亮色航线色板 */
-export const BRIGHT_COLORS: readonly THREE.Vector3[] = [
-  new THREE.Vector3(0.3, 0.8, 1.0),
-  new THREE.Vector3(1.0, 0.5, 0.3),
-  new THREE.Vector3(0.5, 1.0, 0.3),
-  new THREE.Vector3(1.0, 0.3, 0.8),
-  new THREE.Vector3(0.8, 0.8, 0.3),
-  new THREE.Vector3(0.6, 0.3, 1.0),
+export const BRIGHT_COLORS: readonly RouteColor[] = [
+  { r: 0.3, g: 0.8, b: 1.0 },
+  { r: 1.0, g: 0.5, b: 0.3 },
+  { r: 0.5, g: 1.0, b: 0.3 },
+  { r: 1.0, g: 0.3, b: 0.8 },
+  { r: 0.8, g: 0.8, b: 0.3 },
+  { r: 0.6, g: 0.3, b: 1.0 },
 ];
 
-/** 科技航线色板 */
-export const TECH_COLORS: readonly THREE.Vector3[] = [
-  new THREE.Vector3(0.0, 0.8, 1.0),
-  new THREE.Vector3(0.0, 0.4, 0.8),
-  new THREE.Vector3(0.2, 1.0, 0.8),
-  new THREE.Vector3(0.3, 0.6, 1.0),
-  new THREE.Vector3(0.0, 0.9, 0.6),
-  new THREE.Vector3(0.1, 0.5, 0.9),
+export const TECH_COLORS: readonly RouteColor[] = [
+  { r: 0.0, g: 0.8, b: 1.0 },
+  { r: 0.0, g: 0.4, b: 0.8 },
+  { r: 0.2, g: 1.0, b: 0.8 },
+  { r: 0.3, g: 0.6, b: 1.0 },
+  { r: 0.0, g: 0.9, b: 0.6 },
+  { r: 0.1, g: 0.5, b: 0.9 },
 ];
