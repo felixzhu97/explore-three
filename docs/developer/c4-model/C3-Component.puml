@@ -1,0 +1,80 @@
+@startuml C3-Component
+!ROUNDED_STYLE=1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' 样式内联自 style.puml（勿改为 !include）
+UpdateElementStyle("person", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_person", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("system", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_system", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("container", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_container", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("component", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_component", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("node", "#FFFFFF", "#000000", "#000000")
+UpdateBoundaryStyle("", $bgColor="#FFFFFF", $fontColor="#000000", $borderColor="#000000")
+UpdateRelStyle("#000000", "#000000")
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+
+LAYOUT_WITH_LEGEND()
+title [C4 Level 3] Explore Three - 组件图
+
+Container_Boundary(ui, "React UI") {
+    Component(nav, "NavBar", "JSX", "主题路由导航")
+    Component(page_light, "DefaultThemePage", "JSX", "/ 与 /globe-light")
+    Component(page_dark, "DarkThemePage", "JSX", "/globe-dark")
+    Component(globe_view, "Globe", "TSX", "亮色主题挂载")
+    Component(globe_dark, "GlobeDarkTheme", "TSX", "科技主题挂载")
+}
+
+Container_Boundary(domain, "Domain Model (src/domain/model)") {
+    Component(globe, "Globe", "AggregateRoot", "场景组合根 Globe.create")
+    Component(geo, "GeoCoord", "ValueObject", "projectToVector3")
+    Component(route, "FlightRoute", "Entity", "origin / destination")
+    Component(flying, "FlyingLine", "Entity", "createMesh / createMarker")
+    Component(land, "LandMap", "DomainService", "createLandDots")
+    Component(config, "GlobeConfig", "ValueObject", "弧线与材质配置")
+    Component(theme, "ThemeConfig", "ValueObject", "BRIGHT_THEME / TECH_THEME")
+    Component(colors, "ColorScheme", "ValueObject", "createBrightScheme / createTechScheme")
+    Component(scene, "GlobeScene", "DomainService", "Scene / Camera / Renderer")
+    Component(controls, "GlobeControls", "DomainService", "OrbitControls 包装")
+    Component(renderer, "GlobeRenderer", "DomainService", "startRenderLoop")
+    Component(pointer, "GlobePointer", "DomainService", "createInteraction")
+}
+
+Container_Boundary(ext, "Libraries") {
+    Component(threejs, "Three.js", "Library", "WebGL 引擎")
+    Component(orbit, "OrbitControls", "Addon", "轨道相机")
+    Component(gsap, "GSAP", "Library", "挤出补间")
+}
+
+Rel(nav, page_light, "导航到亮色")
+Rel(nav, page_dark, "导航到暗色")
+Rel(page_light, globe_view, "渲染")
+Rel(page_dark, globe_dark, "渲染")
+Rel(globe_view, globe, "Globe.create + BRIGHT_THEME")
+Rel(globe_dark, globe, "Globe.create + TECH_THEME")
+Rel(globe_view, gsap, "u_maxExtrusion tween")
+Rel(globe_dark, gsap, "u_maxExtrusion tween")
+
+Rel(globe, scene, "创建场景")
+Rel(globe, controls, "创建控制器")
+Rel(globe, renderer, "启动循环")
+Rel(globe, pointer, "注册指针")
+Rel(globe, land, "创建陆地点")
+Rel(globe, flying, "创建飞线")
+Rel(globe, config, "读取配置")
+Rel(globe, colors, "解析配色")
+Rel(globe, theme, "应用主题")
+Rel(flying, route, "使用航线")
+Rel(flying, geo, "投影坐标")
+Rel(land, geo, "内部投影")
+Rel(scene, threejs, "THREE.*")
+Rel(controls, orbit, "包装")
+Rel(renderer, threejs, "rAF 渲染")
+Rel(flying, threejs, "TubeGeometry")
+Rel(land, threejs, "CircleGeometry")
+
+SHOW_LEGEND()
+
+@enduml
