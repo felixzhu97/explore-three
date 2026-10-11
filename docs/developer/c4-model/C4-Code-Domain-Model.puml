@@ -1,0 +1,168 @@
+@startuml C4-Code-Domain-Model
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  FontColor #000000
+}
+
+title Code diagram (C4) — Explore Three domain model (src/domain/model)
+hide empty members
+
+legend right
+  |= Stereotype |= Meaning |
+  | <<AggregateRoot>> | Consistency boundary |
+  | <<Entity>> | Identity + lifecycle |
+  | <<ValueObject>> | Immutable by value |
+  | <<DomainService>> | Stateless domain service |
+endlegend
+
+note as N_GLOSSARY
+  Preferred Terms: docs/Glossary.md
+  Types are nouns; methods are verb + noun.
+  Package names are business domains, not file paths.
+end note
+
+package "Geography" as pkg_geo {
+  class GeoCoord <<ValueObject>> {
+    +lat: number
+    +lon: number
+    --
+    +projectToVector3(radius)
+  }
+}
+
+package "Route" as pkg_route {
+  class FlightRoute <<Entity>> {
+    +origin: GeoCoord
+    +destination: GeoCoord
+  }
+  class FlyingLine <<Entity>> {
+    --
+    +{static} createMesh(route, color, config, radius, arcTextures, idx)
+    +{static} createMarker(coord, color, radius, size)
+  }
+  class DEFAULT_FLIGHT_ROUTES <<ValueObject>> {
+    +routes: FlightRoute[]
+  }
+}
+
+package "Theme" as pkg_theme {
+  class ThemeType <<ValueObject>> {
+    +bright
+    +tech
+  }
+  class ThemeConfig <<ValueObject>> {
+    +type: ThemeType
+    +dotShader
+    +lightConfig
+    +buttonStroke: String
+    +sourceUrl: String
+  }
+  class GlobeConfig <<ValueObject>> {
+    +sphereRadius: number
+    +dotRadius: number
+    +tubeRadius: number
+    +animationSpeed: number
+    --
+    +loadArcTextures(callback)
+    +calculateArcPoints(start, end, segments)
+    +createBaseMaterial(type)
+    +createDotMaterial(theme)
+    +addSceneLights(scene, theme, lightPos)
+  }
+  class ColorScheme <<ValueObject>> {
+    --
+    +{static} createBrightScheme()
+    +{static} createTechScheme()
+    +resolveColor(index)
+  }
+}
+
+package "Land" as pkg_land {
+  class LandMap <<DomainService>> {
+    --
+    +createLandDots(material, scene)
+  }
+}
+
+package "Scene" as pkg_scene {
+  class SceneContext <<ValueObject>> {
+    +scene
+    +camera
+    +renderer
+    --
+    +dispose()
+  }
+  class GlobeScene <<DomainService>> {
+    --
+    +{static} create(container, canvas)
+  }
+  class GlobeControls <<DomainService>> {
+    --
+    +{static} create(camera, domElement, config)
+  }
+  class GlobeRenderer <<DomainService>> {
+    --
+    +addFlyingLineMaterials(materials)
+    +addDotMaterials(materials, twinkleSpeed)
+    +startRenderLoop()
+  }
+  class GlobeInteraction <<ValueObject>> {
+    --
+    +bindCallbacks(config)
+    +dispose()
+  }
+  class GlobePointer <<DomainService>> {
+    --
+    +{static} createInteraction(camera, renderer, raycaster, baseMesh)
+  }
+  class GlobeContext <<ValueObject>> {
+    +scene
+    +camera
+    +renderer
+    +controls
+    +interaction: GlobeInteraction
+    +materials
+    +flyingMaterials
+    +baseMesh
+    --
+    +dispose()
+  }
+  class Globe <<AggregateRoot>> {
+    --
+    +{static} create(container, canvas, config, colorScheme, theme, lightPos, interactionConfig)
+  }
+}
+
+FlightRoute --> GeoCoord : origin
+FlightRoute --> GeoCoord : destination
+DEFAULT_FLIGHT_ROUTES "1" *-- "0..*" FlightRoute
+FlyingLine --> FlightRoute
+FlyingLine --> GeoCoord
+FlyingLine --> GlobeConfig
+LandMap --> GlobeConfig
+LandMap --> GeoCoord
+GlobeConfig --> ThemeConfig
+ColorScheme --> ThemeType
+ThemeConfig --> ThemeType
+GlobeScene --> SceneContext
+Globe --> GlobeScene
+Globe --> GlobeControls
+Globe --> GlobeRenderer
+Globe --> GlobePointer
+Globe --> LandMap
+Globe --> FlyingLine
+Globe --> GlobeConfig
+Globe --> ColorScheme
+Globe --> ThemeConfig
+Globe --> GlobeContext
+GlobePointer --> GlobeInteraction
+GlobeRenderer --> GlobeConfig
+GlobeControls --> GlobeConfig
+
+@enduml
