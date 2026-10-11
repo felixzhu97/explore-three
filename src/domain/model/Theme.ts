@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 /** 主题类型 */
 export type ThemeType = 'bright' | 'tech';
 
@@ -95,3 +97,23 @@ export const TECH_THEME: ThemeConfig = {
   buttonStroke: '#ffffff',
   sourceUrl: 'https://github.com/felixzhu97/threejs-globe-stripe',
 };
+
+/** 亮色航线色板 */
+export const BRIGHT_COLORS: readonly THREE.Vector3[] = [
+  new THREE.Vector3(0.3, 0.8, 1.0),
+  new THREE.Vector3(1.0, 0.5, 0.3),
+  new THREE.Vector3(0.5, 1.0, 0.3),
+  new THREE.Vector3(1.0, 0.3, 0.8),
+  new THREE.Vector3(0.8, 0.8, 0.3),
+  new THREE.Vector3(0.6, 0.3, 1.0),
+];
+
+/** 科技航线色板 */
+export const TECH_COLORS: readonly THREE.Vector3[] = [
+  new THREE.Vector3(0.0, 0.8, 1.0),
+  new THREE.Vector3(0.0, 0.4, 0.8),
+  new THREE.Vector3(0.2, 1.0, 0.8),
+  new THREE.Vector3(0.3, 0.6, 1.0),
+  new THREE.Vector3(0.0, 0.9, 0.6),
+  new THREE.Vector3(0.1, 0.5, 0.9),
+];

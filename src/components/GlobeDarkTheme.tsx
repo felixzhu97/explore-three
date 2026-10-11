@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { GlobeConfig, ColorScheme, Globe, GlobeContext, TECH_THEME } from '../domain/model';
+import { TECH_THEME, TECH_COLORS } from '../domain/model';
+import { createGlobe, type GlobeHandle } from '../infra/three';
 
 export default function GlobeDarkTheme() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,46 +13,41 @@ export default function GlobeDarkTheme() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    let app: GlobeContext;
+    let app: GlobeHandle;
     let mouseDown = false;
     let minMouseDownFlag = false;
 
-    app = Globe.create(
-      container,
-      canvas,
-      new GlobeConfig(),
-      ColorScheme.createTechScheme(),
-      TECH_THEME,
-      new THREE.Vector3(-50, 0, 60),
-      {
-        onHover(hit) {
-          document.body.style.cursor = app.state.grabbing ? 'grabbing' : hit ? 'pointer' : 'default';
-        },
-        onDragStart() {
-          if (!app.state.isIntersecting) return;
-          app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.01 }));
-          mouseDown = true;
-          minMouseDownFlag = false;
-          setTimeout(() => {
-            minMouseDownFlag = true;
-            if (!mouseDown) {
-              app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.0, duration: 0.15 }));
-              app.state.grabbing = false;
-              document.body.style.cursor = app.state.isIntersecting ? 'pointer' : 'default';
-            }
-          }, 500);
-          document.body.style.cursor = 'grabbing';
-          app.state.grabbing = true;
-        },
-        onDragEnd() {
-          mouseDown = false;
-          if (!minMouseDownFlag) return;
-          app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.0, duration: 0.15 }));
-          app.state.grabbing = false;
-          document.body.style.cursor = app.state.isIntersecting ? 'pointer' : 'default';
-        },
+    app = createGlobe(container, canvas, {
+      theme: TECH_THEME,
+      colors: TECH_COLORS,
+      lightPos: new THREE.Vector3(-50, 0, 60),
+      onHover(hit) {
+        document.body.style.cursor = app.state.grabbing ? 'grabbing' : hit ? 'pointer' : 'default';
       },
-    );
+      onDragStart() {
+        if (!app.state.isIntersecting) return;
+        app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.01 }));
+        mouseDown = true;
+        minMouseDownFlag = false;
+        setTimeout(() => {
+          minMouseDownFlag = true;
+          if (!mouseDown) {
+            app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.0, duration: 0.15 }));
+            app.state.grabbing = false;
+            document.body.style.cursor = app.state.isIntersecting ? 'pointer' : 'default';
+          }
+        }, 500);
+        document.body.style.cursor = 'grabbing';
+        app.state.grabbing = true;
+      },
+      onDragEnd() {
+        mouseDown = false;
+        if (!minMouseDownFlag) return;
+        app.materials.forEach((m) => gsap.to(m.uniforms.u_maxExtrusion, { value: 1.0, duration: 0.15 }));
+        app.state.grabbing = false;
+        document.body.style.cursor = app.state.isIntersecting ? 'pointer' : 'default';
+      },
+    });
 
     return () => app.dispose();
   }, []);
