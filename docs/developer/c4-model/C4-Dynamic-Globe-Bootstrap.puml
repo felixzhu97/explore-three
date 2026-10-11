@@ -3,33 +3,31 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 
-title Dynamic — Globe bootstrap (createGlobe → dispose)
+title Dynamic — Globe bootstrap (GlobeService.mount → dispose)
 
 actor "Browser User" as user
-participant "Theme Page\n(React)" as page <<ui>>
-participant "createGlobe\n(infra/three)" as globe
-participant "GlobeRoot" as root
-participant "LandDotsGroup" as land
-participant "FlightArc /\nRouteMarker" as arc
+participant "Theme Page\n(Angular)" as page <<ui>>
+participant "GlobeHostComponent" as host
+participant "GlobeService" as globe
+participant "GlobeGroup" as root
 participant "WebGL Canvas" as canvas
 
 user -> page: 1. Open /globe-light or /globe-dark
-page -> globe: 2. createGlobe(container, canvas, { theme, colors })
-globe -> root: 3. new GlobeRoot(theme, colors)
-root -> land: 4. LandDotsGroup(themeId, config)
-land --> root: 5. materials[]
-root -> arc: 6. FlightArc / RouteMarker (per DEFAULT_ROUTES)
-arc --> root: 7. meshes
-globe -> canvas: 8. requestAnimationFrame (root.tick)
-globe --> page: 9. GlobeHandle { materials, state, dispose }
-page --> user: 10. Interactive globe
+page -> host: 2. render app-globe-host
+host -> globe: 3. mount(container, canvas, options)
+globe -> root: 4. new GlobeGroup(...)
+root --> globe: 5. scene graph
+globe -> canvas: 6. requestAnimationFrame
+globe --> host: 7. GlobeSession
+page --> user: 8. Interactive globe
 
-note right of page
-  On unmount: handle.dispose()
+note right of host
+  On destroy: session.dispose()
   stops rAF and removes listeners
 end note
 
-user -> page: 11. Leave route / unmount
-page -> globe: 12. dispose()
+user -> page: 9. Leave route / unmount
+page -> host: 10. ngOnDestroy
+host -> globe: 11. dispose()
 
 @enduml

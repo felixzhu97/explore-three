@@ -18,10 +18,10 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 | --- | --- | --- |
 | `style.puml` | Shared | Structural white/black tokens（结构图内联，勿 `!include`） |
 | `C1-Context.puml` | C1 | 系统上下文（Browser User、Vercel、Static Assets） |
-| `C2-Container.puml` | C2 | Vite / React / Domain / Three.js / GSAP |
-| `C3-Component.puml` | C3 | **单图**：UI + `src/domain/model` |
-| `C4-Code-Domain-Model.puml` | Code | 领域模型（Glossary Preferred Term） |
-| `C4-Deployment.puml` | Deployment | **单图**：本地 Vite + 生产 Vercel |
+| `C2-Container.puml` | C2 | Angular / domain folders / Three.js / GSAP |
+| `C3-Component.puml` | C3 | **单图**：UI + geography/route/theme/globe |
+| `C4-Code-Domain-Model.puml` | Code | 产品类型（Glossary Preferred Term） |
+| `C4-Deployment.puml` | Deployment | **单图**：本地 `ng serve` + 生产 Vercel |
 | `C4-Dynamic-Globe-Bootstrap.puml` | Dynamic | 挂载 → 渲染循环 → dispose |
 
 ## C1 - 系统上下文图
@@ -40,7 +40,7 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 
 ![C4-Code-Domain-Model](png/C4-Code-Domain-Model.png)
 
-只画 `src/domain/model`（Geography / Route / Theme）。渲染适配见 C3 中的 `infra/three`。术语见 [Glossary](../../Glossary.md)。
+按领域文件夹绘制产品类型（Geography / Route / Theme）。Globe 编排见 C3。术语见 [Glossary](../../Glossary.md)。
 
 ## C4 - 部署图
 
@@ -54,12 +54,11 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 
 | Layer | Tech |
 | --- | --- |
-| UI | React 19 + react-router-dom |
-| Domain | TypeScript `src/domain/model/`（GeoCoord / SpherePoint / FlightRoute / ThemeAppearance） |
-| Infra | `src/infra/three/`（GlobeRoot / FlightArc / LandDotsGroup / createGlobe） |
+| UI | Angular 22 + router |
+| Domains | `src/geography/` · `src/route/` · `src/theme/` · `src/globe/` |
 | 3D | Three.js + OrbitControls + GLSL |
 | Animation | GSAP |
-| Build | Vite 6 |
+| Build | Angular application builder |
 | Deploy | Vercel SPA (`vercel.json` rewrite) |
 
 ## Render

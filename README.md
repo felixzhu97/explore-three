@@ -1,6 +1,7 @@
 # Explore Three
 
-An interactive 3D globe visualization built with Three.js, featuring a twinkling star effect and animated flying lines connecting global locations.
+An interactive 3D globe visualization built with Three.js and Angular, featuring
+twinkling land dots and animated flying lines between geographic coordinates.
 
 Package / repo: `explore-three`.
 
@@ -13,15 +14,19 @@ Package / repo: `explore-three`.
 
 ## Tech Stack
 
-- Three.js - 3D rendering
-- React - UI framework
-- Custom GLSL shaders - Twinkling and scatter effects
+- Angular 22 — UI, routing, services
+- Three.js — 3D rendering
+- GSAP — drag extrusion tweens
+- Tailwind CSS v4 — layout utilities
+- Custom GLSL shaders — twinkling and scatter effects
 
 ## Getting Started
 
+Requires Node.js ≥ 22.22.3 (see `.nvmrc`).
+
 ```bash
 pnpm install
-pnpm run dev
+pnpm start
 ```
 
 ## Docs

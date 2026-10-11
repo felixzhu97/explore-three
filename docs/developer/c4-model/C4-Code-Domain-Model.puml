@@ -10,24 +10,23 @@ skinparam class {
   FontColor #000000
 }
 
-title Code diagram (C4) — Explore Three domain (src/domain/model only)
+title Code diagram — product types by domain folder
 hide empty members
 
 legend right
   |= Stereotype |= Meaning |
   | <<Entity>> | Identity + lifecycle |
   | <<ValueObject>> | Immutable by value |
+  | <<Service>> | Angular injectable |
 endlegend
 
 note as N_LAYERS
-  components → infra/three → domain/model
-  Mesh/Group (FlightArc, GlobeRoot, …)
-  + materials live in src/infra/three —
-  not on this diagram.
+  Folders: geography / route / theme / globe
+  (no src/domain or src/infra packages)
   Preferred Terms: docs/Glossary.md
 end note
 
-package "Geography" as pkg_geo {
+package "geography" as pkg_geo {
   class SpherePoint <<ValueObject>> {
     +x: number
     +y: number
@@ -39,9 +38,10 @@ package "Geography" as pkg_geo {
     --
     +projectToSpherePoint(radius)
   }
+  class GeographyService <<Service>>
 }
 
-package "Route" as pkg_route {
+package "route" as pkg_route {
   class FlightRoute <<Entity>> {
     +origin: GeoCoord
     +destination: GeoCoord
@@ -49,12 +49,12 @@ package "Route" as pkg_route {
     +{static} of(origin, destination)
     +endpoints()
   }
-  class DEFAULT_ROUTES <<ValueObject>> {
-    +routes: FlightRoute[]
+  class RouteService <<Service>> {
+    +defaultRoutes: FlightRoute[]
   }
 }
 
-package "Theme" as pkg_theme {
+package "theme" as pkg_theme {
   class ThemeId <<ValueObject>> {
     +bright
     +tech
@@ -70,20 +70,15 @@ package "Theme" as pkg_theme {
     +buttonStroke: String
     +sourceUrl: String
   }
-  class BRIGHT_THEME <<ValueObject>>
-  class TECH_THEME <<ValueObject>>
-  class BRIGHT_COLORS <<ValueObject>>
-  class TECH_COLORS <<ValueObject>>
+  class ThemeService <<Service>>
 }
 
 GeoCoord --> SpherePoint : projectToSpherePoint
 FlightRoute --> GeoCoord : origin
 FlightRoute --> GeoCoord : destination
-DEFAULT_ROUTES "1" *-- "0..*" FlightRoute
+RouteService --> FlightRoute
+ThemeService --> ThemeAppearance
 ThemeAppearance --> ThemeId
-BRIGHT_THEME --> ThemeAppearance
-TECH_THEME --> ThemeAppearance
-BRIGHT_COLORS --> RouteColor
-TECH_COLORS --> RouteColor
+ThemeService --> RouteColor
 
 @enduml

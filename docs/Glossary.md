@@ -2,8 +2,8 @@
 
 > Explore Three — Ubiquitous Language（统一语言）
 
-Interactive 3D globe (Three.js) with land dots, twinkling shaders, and
-animated flying routes between geographic coordinates.
+Interactive 3D globe (Three.js + Angular) with land dots, twinkling shaders,
+and animated flying routes between geographic coordinates.
 
 ---
 
@@ -16,7 +16,7 @@ naming. Chinese labels are for localization and stakeholder communication.
 ### Maintenance Principles
 
 1. **Glossary first**: Add or update terms here before implementing code
-2. **Code sync**: Domain model changes must update the corresponding entry
+2. **Code sync**: Domain language changes must update the corresponding entry
 3. **Preferred term**: Use the **Preferred Term (English)** column for code,
    commits, and technical docs
 
@@ -24,22 +24,23 @@ naming. Chinese labels are for localization and stakeholder communication.
 
 | Kind | Rule | Example |
 | --- | --- | --- |
-| Domain type | Noun (what it is) | `GeoCoord`, `FlightRoute`, `ThemeAppearance` |
-| Method | Verb + noun (what it does) | `projectToSpherePoint`, `endpoints` |
-| Infra object | Extends `Mesh` / `Group` | `FlightArc`, `GlobeRoot` |
-| Infra bootstrap | Verb phrase function | `createGlobe` |
-| Infra bridge | Small function (not a base class) | `toVector3` |
-| Resource cleanup | Keep Three.js `dispose` | `dispose` |
-| Barrel `index.ts` | Avoid — import concrete files | `../domain/model/Theme` |
+| Product type | Noun | `GeoCoord`, `FlightRoute`, `ThemeAppearance` |
+| Angular page | `*.page.ts` / `*PageComponent` | `globe-light.page.ts` |
+| Angular service | `*.service.ts` | `globe.service.ts` |
+| Angular component | `*.component.ts` | `globe-host.component.ts` |
+| Other files | kebab-case matching class | `flight-arc.ts` → `FlightArc` |
+| Resource cleanup | Three.js `dispose` | `dispose` |
+| Barrel `index.ts` | Avoid | import concrete files |
 
-### Layers
+### Layers (by business domain folder)
 
 ```
-components (UI) → infra/three (WebGL) → domain/model
+app (shell) → globe / route / theme / geography
 ```
 
-Domain holds product language only — **no** `import 'three'`, no GLSL.
-Three.js scene objects live under `src/infra/three/` (Mr.doob style).
+No top-level `domain/` or `infra/` packages. Types live in the owning
+`*.service.ts` (or `geo-coord.ts` for geography primitives). Theme and
+geography files do not import `three`.
 
 ---
 
@@ -47,18 +48,17 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 
 | Preferred Term | 中文 | Path | Frontend Route | Notes |
 | --- | --- | --- | --- | --- |
-| Geography | 地理 | `src/domain/model/GeoCoord.ts` | — | Lat/lon + sphere projection |
-| Route | 航线 | `src/domain/model/FlightRoute.ts` | — | OD pairs + `DEFAULT_ROUTES` |
-| Theme | 主题 | `src/domain/model/Theme.ts` | `/`, `/globe-light`, `/globe-dark` | Bright vs tech |
-| Globe (UI) | 地球仪页 | `src/components/` | same routes | React mount |
-| Three infra | 渲染适配 | `src/infra/three/` | — | Mesh/Group + materials |
+| Geography | 地理 | `src/geography/` | — | Lat/lon + sphere projection |
+| Route | 航线 | `src/route/` | — | OD pairs, arcs, markers |
+| Theme | 主题 | `src/theme/theme.service.ts` | `/`, `/globe-light`, `/globe-dark` | Bright vs tech |
+| Globe | 地球仪 | `src/globe/` | same routes | Pages, host, scene group |
 
 **Frontend route map (canonical)**
 
 | Route | Theme |
 | --- | --- |
-| `/`, `/globe-light` | `BRIGHT_THEME` + `BRIGHT_COLORS` |
-| `/globe-dark` | `TECH_THEME` + `TECH_COLORS` |
+| `/`, `/globe-light` | bright theme + colors |
+| `/globe-dark` | tech theme + colors |
 
 ---
 
@@ -66,30 +66,27 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 
 | Preferred Term | 中文 | Definition | Type | Code Mapping |
 | --- | --- | --- | --- | --- |
-| SpherePoint | 球面点 | Cartesian point on a scaled sphere | Value Object | `SpherePoint` |
-| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value Object | `GeoCoord.projectToSpherePoint` |
-| FlightRoute | 航线 | Origin and destination coordinates | Entity | `FlightRoute.of` |
-| DEFAULT_ROUTES | 默认航线 | Six international city pairs | Constant | `DEFAULT_ROUTES` |
-| ThemeId | 主题标识 | `bright` or `tech` | Union | `ThemeId` |
-| ThemeAppearance | 主题外观 | Lights, CTA stroke, source URL (no shaders) | Value Object | `ThemeAppearance` |
-| RouteColor | 航线色 | RGB 0..1 route color | Value Object | `RouteColor` |
-| BRIGHT_THEME / TECH_THEME | 亮色 / 科技主题 | Product theme presets | Constant | `Theme.ts` |
-| BRIGHT_COLORS / TECH_COLORS | 航线色板 | Per-route arc colors | Constant | `colors[i % n]` |
+| SpherePoint | 球面点 | Cartesian point on a scaled sphere | Value | `geography/geo-coord.ts` |
+| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value | `GeoCoord.projectToSpherePoint` |
+| FlightRoute | 航线 | Origin and destination coordinates | Entity | `route.service.ts` |
+| DEFAULT_ROUTES | 默认航线 | Six international city pairs | Constant | `RouteService.defaultRoutes` |
+| ThemeId | 主题标识 | `bright` or `tech` | Union | `theme.service.ts` |
+| ThemeAppearance | 主题外观 | Lights, CTA stroke, source URL | Value | `ThemeService` |
+| RouteColor | 航线色 | RGB 0..1 route color | Value | `theme.service.ts` |
 
 ---
 
-## 4. Infra (non-domain) | 基础设施
+## 4. Globe / Route rendering | 渲染协作
 
 | Name | Path | Role |
 | --- | --- | --- |
-| `createGlobe` | `src/infra/three/createGlobe.ts` | Scene / Camera / Renderer / Controls / rAF |
-| `GlobeRoot` | `src/infra/three/GlobeRoot.ts` | `Group` — lights, base, dots, arcs, markers |
-| `LandDotsGroup` | `src/infra/three/LandDotsGroup.ts` | `Group` — texture → land dots |
-| `FlightArc` | `src/infra/three/FlightArc.ts` | `Mesh` — animated route tube |
-| `RouteMarker` | `src/infra/three/RouteMarker.ts` | `Mesh` — endpoint disc |
-| materials | `src/infra/three/materials/` | Dot / arc / marker shaders |
-| `toVector3` | `src/infra/three/sphereVector.ts` | `SpherePoint` → Three `Vector3` |
-| `defaults` | `src/infra/three/config.ts` | Radii, tube, animation, texture URLs |
+| `GlobeService.mount` | `src/globe/globe.service.ts` | Scene / Camera / Renderer / Controls / rAF |
+| `GlobeGroup` | `src/globe/globe-group.ts` | `Group` — lights, base, dots, arcs, markers |
+| `LandDotsGroup` | `src/globe/land-dots-group.ts` | Land mask → dots |
+| `FlightArc` | `src/route/flight-arc.ts` | Route tube mesh |
+| `RouteMarker` | `src/route/route-marker.ts` | Endpoint disc |
+| `globe.config` | `src/globe/globe.config.ts` | Radii, tube, animation, texture URLs |
+| `GlobeHostComponent` | `src/globe/globe-host.component.ts` | Canvas mount + GSAP interaction |
 
 ---
 
@@ -97,16 +94,11 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 
 | Avoid | Prefer | Reason |
 | --- | --- | --- |
-| `Globe` / `GlobeApp` as domain aggregate | `GlobeRoot` / `createGlobe` in infra | Bootstrap is not a domain aggregate |
-| `GlobeScene` / `GlobeControls` / `GlobeRenderer` | inline in `createGlobe` | Thin Three.js wrappers |
-| GLSL / `THREE.*` in `domain/model` | `src/infra/three/materials/` | Domain stays product language |
-| `ThemeConfig.dotShader` | `ThemeAppearance` + `DotMaterial` | Shaders are infra |
-| `ColorScheme.createBrightScheme()` | `BRIGHT_COLORS` | Simple constants |
-| `DEFAULT_FLIGHT_ROUTES` | `DEFAULT_ROUTES` | Shorter Preferred Term |
-| `addLandDots` / `createArc` factories | `LandDotsGroup` / `FlightArc` | Align with Object3D model |
-| `DisposableMesh` / shared Mesh base | keep `extends Mesh` / `Group` | Too little shared behavior |
-| `domain/model/index.ts` barrel | `domain/model/Theme.ts` etc. | Prefer concrete modules |
-| AggregateRoot / DomainService labels on Three helpers | — | Avoid costume DDD |
+| `src/domain/` / `src/infra/` packages | `src/{geography,route,theme,globe}/` | Organize by business domain |
+| `create-globe.ts` | `GlobeService.mount` | Angular naming; no verb files |
+| `GlobeRoot` | `GlobeGroup` | Noun aligned with Object3D role |
+| Barrel `index.ts` | concrete file imports | Explicit dependencies |
+| Forced `.mesh` / `.group` suffixes | kebab class names | Only service/component/page use suffixes |
 
 ---
 
@@ -116,5 +108,5 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 | --- | --- |
 | C4 model | [docs/developer/c4-model/](./developer/c4-model/) |
 | User Story Map | [docs/product-owner/User-Story-Map.md](./product-owner/User-Story-Map.md) |
-| Domain source | `src/domain/model/` |
-| Three infra | `src/infra/three/` |
+| App shell | `src/app/` |
+| Domains | `src/geography/`, `src/route/`, `src/theme/`, `src/globe/` |

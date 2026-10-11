@@ -1,7 +1,6 @@
 @startuml C4-Deployment
 !ROUNDED_STYLE=1
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
-' 样式内联自 style.puml（勿改为 !include）
 UpdateElementStyle("person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("external_person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("system", "#FFFFFF", "#000000", "#000000")
@@ -17,26 +16,19 @@ skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 
 LAYOUT_WITH_LEGEND()
-title [C4 Deployment] Explore Three - 本地与生产
+title [C4] Explore Three - 部署图
 
-Deployment_Node(dev_machine, "Developer Machine", "macOS / Linux") {
-    Deployment_Node(vite_node, "Vite", "pnpm run dev") {
-        Container(dev_spa, "Globe App (dev)", "React + Three.js", "HMR :5173")
-    }
-    Deployment_Node(local_assets, "Workspace", "filesystem") {
-        ContainerDb(dev_img, "public/img", "static", "纹理同源")
+Deployment_Node(local, "Developer Machine", "macOS / Linux") {
+    Deployment_Node(ng_node, "Angular CLI", "pnpm start") {
+        Container(dev_spa, "Globe App (dev)", "Angular + Three.js", "HMR :4200")
     }
 }
 
-Deployment_Node(vercel_cloud, "Vercel", "Edge CDN") {
-    Deployment_Node(prod_static, "Static Build", "vite build → dist") {
-        Container(prod_spa, "Globe App (prod)", "SPA", "vercel.json rewrite /* → /index.html")
-        ContainerDb(prod_img, "Bundled assets", "static", "img 随构建发布")
-    }
+Deployment_Node(vercel_cloud, "Vercel", "CDN") {
+    Container(prod_spa, "Globe App (prod)", "Static dist/explore-three/browser", "SPA rewrite")
 }
 
-Rel(dev_spa, dev_img, "加载纹理", "same-origin")
-Rel(prod_spa, prod_img, "加载纹理", "same-origin")
+Rel(dev_spa, prod_spa, "pnpm build → deploy", "CI / Vercel")
 
 SHOW_LEGEND()
 
