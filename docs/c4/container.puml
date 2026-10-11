@@ -3,7 +3,7 @@
 
 LAYOUT_WITH_LEGEND()
 
-title Container Diagram - threejs-globe
+title Container Diagram - Explore Three
 
 Person(user, "User", "End user accessing the application")
 
