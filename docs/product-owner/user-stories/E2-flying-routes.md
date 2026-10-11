@@ -17,8 +17,8 @@
 ### 验收标准
 
 1. **Scenario** 加载默认航线  
-   **GIVEN** `DEFAULT_FLIGHT_ROUTES` 包含六条城市场景  
-   **WHEN** `Globe.create` 完成引导  
+   **GIVEN** `DEFAULT_ROUTES` 包含六条城市场景  
+   **WHEN** `createGlobe` 完成引导  
    **THEN** 每条航线渲染为动画 Tube 飞线  
    **AND** 飞线使用弧线纹理与主题配色
 
@@ -38,7 +38,7 @@
 
 1. **Scenario** 端点 Marker  
    **GIVEN** 一条 `FlightRoute` 已创建飞线  
-   **WHEN** 调用 `FlyingLine.createMarker` 于 origin 与 destination  
+   **WHEN** 调用 `createMarker` 于 origin 与 destination  
    **THEN** 两端显示 disc 纹理平面  
    **AND** 颜色与该航线飞线一致
 

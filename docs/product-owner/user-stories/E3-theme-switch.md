@@ -19,7 +19,7 @@
 1. **Scenario** 访问亮色路由  
    **GIVEN** 用户打开 `/` 或 `/globe-light`  
    **WHEN** 页面挂载 `Globe` 组件  
-   **THEN** 使用 `BRIGHT_THEME` 与 `ColorScheme.createBrightScheme()`  
+   **THEN** 使用 `BRIGHT_THEME` 与 `BRIGHT_COLORS`  
    **AND** NavBar 可导航至暗色主题
 
 ### 状态
@@ -39,7 +39,7 @@
 1. **Scenario** 访问暗色路由  
    **GIVEN** 用户打开 `/globe-dark`  
    **WHEN** 页面挂载 `GlobeDarkTheme` 组件  
-   **THEN** 使用 `TECH_THEME` 与 `ColorScheme.createTechScheme()`  
+   **THEN** 使用 `TECH_THEME` 与 `TECH_COLORS`  
    **AND** 点光源位置按暗色主题配置
 
 ### 状态

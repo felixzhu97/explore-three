@@ -40,7 +40,7 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 
 ![C4-Code-Domain-Model](png/C4-Code-Domain-Model.png)
 
-按业务域分包（Geography / Route / Theme / Land / Scene）。术语见 [Glossary](../../Glossary.md)。
+只画 `src/domain/model`（Geography / Route / Theme）。渲染适配见 C3 中的 `infra/three`。术语见 [Glossary](../../Glossary.md)。
 
 ## C4 - 部署图
 
@@ -55,7 +55,8 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 | Layer | Tech |
 | --- | --- |
 | UI | React 19 + react-router-dom |
-| Domain | TypeScript `src/domain/model/` |
+| Domain | TypeScript `src/domain/model/`（GeoCoord / FlightRoute / Theme） |
+| Infra | `src/infra/three/`（createGlobe / land / arcs） |
 | 3D | Three.js + OrbitControls + GLSL |
 | Animation | GSAP |
 | Build | Vite 6 |

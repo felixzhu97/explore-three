@@ -1,16 +1,9 @@
 export { GeoCoord } from './GeoCoord';
-export type { ThemeType, ThemeConfig } from './ThemeConfig';
-export { BRIGHT_THEME, TECH_THEME } from './ThemeConfig';
-export { GlobeConfig } from './GlobeConfig';
-export { ColorScheme } from './ColorScheme';
-export { FlightRoute, DEFAULT_FLIGHT_ROUTES } from './FlightRoute';
-export { FlyingLine } from './FlyingLine';
-export { LandMap } from './LandMap';
-export type { SceneContext } from './GlobeScene';
-export { GlobeScene } from './GlobeScene';
-export { OrbitControls, GlobeControls } from './GlobeControls';
-export { GlobeRenderer } from './GlobeRenderer';
-export type { GlobeInteractionConfig, GlobeInteraction } from './GlobePointer';
-export { GlobePointer } from './GlobePointer';
-export type { GlobeContext } from './Globe';
-export { Globe } from './Globe';
+export { FlightRoute, DEFAULT_ROUTES } from './FlightRoute';
+export type { ThemeType, ThemeConfig } from './Theme';
+export {
+  BRIGHT_THEME,
+  TECH_THEME,
+  BRIGHT_COLORS,
+  TECH_COLORS,
+} from './Theme';

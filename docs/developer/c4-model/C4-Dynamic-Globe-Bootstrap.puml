@@ -3,38 +3,31 @@
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 
-title Dynamic — Globe bootstrap (mount → render loop → dispose)
+title Dynamic — Globe bootstrap (createGlobe → dispose)
 
 actor "Browser User" as user
 participant "Theme Page\n(React)" as page <<ui>>
-participant "Globe\n(AggregateRoot)" as globe
-participant "LandMap" as land
-participant "FlyingLine" as flying
-participant "GlobeRenderer" as renderer
-participant "GlobePointer" as pointer
+participant "createGlobe\n(infra/three)" as globe
+participant "addLandDots" as land
+participant "createArc" as arc
 participant "WebGL Canvas" as canvas
 
 user -> page: 1. Open /globe-light or /globe-dark
-page -> globe: 2. Globe.create(container, canvas, config, scheme, theme)
-globe -> land: 3. createLandDots(material, scene)
+page -> globe: 2. createGlobe(container, canvas, { theme, colors })
+globe -> land: 3. addLandDots(scene, material, config)
 land --> globe: 4. materials[]
-globe -> flying: 5. createMesh / createMarker (per DEFAULT_FLIGHT_ROUTES)
-flying --> globe: 6. meshes
-globe -> renderer: 7. startRenderLoop()
-renderer -> canvas: 8. requestAnimationFrame render
-globe -> pointer: 9. createInteraction(...)
-pointer --> globe: 10. interaction + state
-globe --> page: 11. GlobeContext
-page --> user: 12. Interactive globe
+globe -> arc: 5. createArc / createMarker (per DEFAULT_ROUTES)
+arc --> globe: 6. meshes
+globe -> canvas: 7. requestAnimationFrame render
+globe --> page: 8. GlobeHandle { materials, state, dispose }
+page --> user: 9. Interactive globe
 
 note right of page
-  On unmount: GlobeContext.dispose()
+  On unmount: handle.dispose()
   stops rAF and removes listeners
 end note
 
-user -> page: 13. Leave route / unmount
-page -> globe: 14. dispose()
-globe -> renderer: 15. cancelAnimationFrame
-globe -> pointer: 16. dispose listeners
+user -> page: 10. Leave route / unmount
+page -> globe: 11. dispose()
 
 @enduml

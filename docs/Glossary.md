@@ -24,80 +24,85 @@ naming. Chinese labels are for localization and stakeholder communication.
 
 | Kind | Rule | Example |
 | --- | --- | --- |
-| Aggregate / Entity / VO / Config | Noun (what it is) | `Globe`, `FlightRoute`, `GeoCoord` |
-| Method | Verb + noun (what it does) | `createMarker`, `calculateArcPoints` |
-| Factory | `create…` / `createFor…` | `createBrightScheme` |
+| Domain type | Noun (what it is) | `GeoCoord`, `FlightRoute`, `Theme` |
+| Method | Verb + noun (what it does) | `projectToVector3`, `createArc` |
+| Infra bootstrap | Verb phrase function | `createGlobe`, `addLandDots` |
 | Resource cleanup | Keep Three.js `dispose` | `dispose` |
+
+### Layers
+
+```
+components (UI) → infra/three (WebGL) → domain/model
+```
+
+Domain holds product language only. Three.js scene wiring lives under
+`src/infra/three/`.
 
 ---
 
 ## 2. Business Domains | 业务域总览
 
-| Preferred Term | 中文 | TS Module | Frontend Route | Notes |
+| Preferred Term | 中文 | Path | Frontend Route | Notes |
 | --- | --- | --- | --- | --- |
-| Globe | 地球仪 | `src/domain/model/Globe.ts` | `/`, `/globe-light`, `/globe-dark` | Aggregate root; scene composition |
-| Geography | 地理 | `src/domain/model/GeoCoord.ts` | — | Lat/lon projection onto sphere |
-| Route | 航线 | `src/domain/model/FlightRoute.ts`, `FlyingLine.ts` | — | Default international routes |
-| Theme | 主题 | `src/domain/model/ThemeConfig.ts`, `ColorScheme.ts`, `GlobeConfig.ts` | `/globe-light`, `/globe-dark` | Bright vs tech palettes |
-| Land | 陆地 | `src/domain/model/LandMap.ts` | — | Texture → land dots |
-| Scene | 场景 | `src/domain/model/GlobeScene.ts`, `GlobeControls.ts`, `GlobeRenderer.ts`, `GlobePointer.ts` | — | WebGL loop and pointer interaction |
+| Geography | 地理 | `src/domain/model/GeoCoord.ts` | — | Lat/lon + sphere projection |
+| Route | 航线 | `src/domain/model/FlightRoute.ts` | — | OD pairs + `DEFAULT_ROUTES` |
+| Theme | 主题 | `src/domain/model/Theme.ts` | `/`, `/globe-light`, `/globe-dark` | Bright vs tech |
+| Globe (UI) | 地球仪页 | `src/components/` | same routes | React mount |
+| Three infra | 渲染适配 | `src/infra/three/` | — | Non-domain WebGL |
 
 **Frontend route map (canonical)**
 
-| Route | Preferred Term | Theme |
-| --- | --- | --- |
-| `/`, `/globe-light` | Globe | Bright (`BRIGHT_THEME`) |
-| `/globe-dark` | Globe | Tech (`TECH_THEME`) |
+| Route | Theme |
+| --- | --- |
+| `/`, `/globe-light` | `BRIGHT_THEME` + `BRIGHT_COLORS` |
+| `/globe-dark` | `TECH_THEME` + `TECH_COLORS` |
 
 ---
 
 ## 3. Domain Kernel | 领域内核
 
-| Preferred Term | 中文 | Definition | Type | Code Mapping | Notes |
-| --- | --- | --- | --- | --- | --- |
-| Globe | 地球仪 | Composition root that builds scene, land dots, routes, render loop, and pointer interaction | Aggregate Root | `Globe.create` → `GlobeContext` | Former name `GlobeApp` |
-| GlobeContext | 地球仪上下文 | Live handles for scene, materials, interaction, and `dispose` | Value Object / Context | `GlobeContext` | Returned by `Globe.create` |
-| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value Object | `GeoCoord.projectToVector3` | Validates bounds on construction |
-| FlightRoute | 航线 | Origin and destination geographic coordinates | Entity | `FlightRoute.origin`, `.destination` | Former fields `start` / `end` |
-| FlyingLine | 飞线 | Curved tube mesh and endpoint markers for a route | Entity | `FlyingLine.createMesh`, `createMarker` | Uses arc textures |
-| DEFAULT_FLIGHT_ROUTES | 默认航线 | Six international city-pair routes | Constant | `DEFAULT_FLIGHT_ROUTES` | Former `DEFAULT_ROUTES` |
-| ThemeType | 主题类型 | `bright` or `tech` | Enum / Union | `ThemeType` | Discriminates palettes |
-| ThemeConfig | 主题配置 | Dot shaders, lights, CTA stroke, source URL | Value Object | `ThemeConfig` | `BRIGHT_THEME`, `TECH_THEME` |
-| GlobeConfig | 地球仪配置 | Radii, density, tube, animation, textures, orbit limits | Value Object | `GlobeConfig` | Methods: `loadArcTextures`, `calculateArcPoints`, `createBaseMaterial`, `createDotMaterial`, `addSceneLights` |
-| ColorScheme | 配色方案 | Per-route arc/marker colors | Value Object | `ColorScheme.createBrightScheme`, `createTechScheme`, `resolveColor` | |
-| LandMap | 陆地地图 | Extracts land lon/lat from world alpha texture and builds dots | Domain Service | `LandMap.createLandDots` | |
-| GlobeScene | 场景工厂 | Creates Scene / Camera / Renderer | Domain Service | `GlobeScene.create` → `SceneContext` | |
-| GlobeControls | 轨道控制 | OrbitControls wrapper with auto-rotate limits | Domain Service | `GlobeControls.create` | |
-| GlobeRenderer | 渲染循环 | requestAnimationFrame loop updating shader uniforms | Domain Service | `GlobeRenderer.startRenderLoop` | |
-| GlobePointer | 指针交互 | Raycast hover and drag callbacks on the base sphere | Domain Service | `GlobePointer.createInteraction` | Former `GlobeEvents` |
-| GlobeInteraction | 交互句柄 | Bind callbacks and dispose listeners | Interface | `bindCallbacks`, `dispose` | |
+| Preferred Term | 中文 | Definition | Type | Code Mapping |
+| --- | --- | --- | --- | --- |
+| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value Object | `GeoCoord.projectToVector3` |
+| FlightRoute | 航线 | Origin and destination coordinates | Entity | `origin`, `destination` |
+| DEFAULT_ROUTES | 默认航线 | Six international city pairs | Constant | `DEFAULT_ROUTES` |
+| ThemeType | 主题类型 | `bright` or `tech` | Union | `ThemeType` |
+| ThemeConfig | 主题配置 | Dot shaders, lights, CTA stroke, source URL | Value Object | `ThemeConfig` |
+| BRIGHT_THEME / TECH_THEME | 亮色 / 科技主题 | Product theme presets | Constant | `Theme.ts` |
+| BRIGHT_COLORS / TECH_COLORS | 航线色板 | Per-route arc colors | Constant | `colors[i % n]` |
 
 ---
 
-## 4. Terms to Avoid | 避免使用的名称
+## 4. Infra (non-domain) | 基础设施
+
+| Name | Path | Role |
+| --- | --- | --- |
+| `createGlobe` | `src/infra/three/createGlobe.ts` | Bootstrap scene, land, arcs, loop, pointer |
+| `addLandDots` | `src/infra/three/land.ts` | Texture → land dot meshes |
+| `createArc` / `createMarker` | `src/infra/three/flyingLine.ts` | Flight arc tube + endpoint marker |
+| `defaults` | `src/infra/three/config.ts` | Radii, tube, animation, texture URLs |
+
+---
+
+## 5. Terms to Avoid | 避免使用的名称
 
 | Avoid | Prefer | Reason |
 | --- | --- | --- |
-| `GlobeApp` | `Globe` | Aggregate noun without tech suffix |
-| `GlobeAppContext` | `GlobeContext` | Align with aggregate |
-| `GlobeEvents` | `GlobePointer` | Describes pointer interaction, not an event log |
-| `domain.ts` (single file) | `src/domain/model/` | DDD `domain/model` layout |
-| `DEFAULT_ROUTES` | `DEFAULT_FLIGHT_ROUTES` | Explicit noun |
-| `FlightRoute.start` / `.end` | `.origin` / `.destination` | Route language |
-| `toVector3` | `projectToVector3` | Verb + noun |
-| `bezierCurvePoints` | `calculateArcPoints` | Verb + noun |
-| `bright()` / `tech()` | `createBrightScheme` / `createTechScheme` | Factory naming |
-| `FlyingLine.marker` | `FlyingLine.createMarker` | Verb + noun |
-| `LandMap.createDots` | `createLandDots` | Explicit noun |
-| `GlobeRenderer.start` | `startRenderLoop` | Verb + noun |
-| `style-zinc.puml` | `style.puml` | Shared C4 style filename |
+| `Globe` / `GlobeApp` as domain aggregate | `createGlobe` in infra | Bootstrap is not a domain aggregate |
+| `GlobeScene` / `GlobeControls` / `GlobeRenderer` / `GlobePointer` | inline in `createGlobe` | Thin Three.js wrappers |
+| Putting Three factories under `domain/model` | `src/infra/three/` | Domain stays product language |
+| `ColorScheme.createBrightScheme()` | `BRIGHT_COLORS` | Simple constants |
+| `DEFAULT_FLIGHT_ROUTES` | `DEFAULT_ROUTES` | Shorter Preferred Term |
+| `LandMap` / `FlyingLine` classes | `addLandDots` / `createArc` | Verb functions in infra |
+| AggregateRoot / DomainService labels on Three helpers | — | Avoid costume DDD |
 
 ---
 
-## 5. Maintenance | 维护
+## 6. Maintenance | 维护
 
 | Related | Path |
 | --- | --- |
 | C4 model | [docs/developer/c4-model/](./developer/c4-model/) |
 | User Story Map | [docs/product-owner/User-Story-Map.md](./product-owner/User-Story-Map.md) |
 | Domain source | `src/domain/model/` |
+| Three infra | `src/infra/three/` |
