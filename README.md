@@ -24,10 +24,14 @@ pnpm install
 pnpm run dev
 ```
 
+## Docs
+
+- [Glossary](docs/Glossary.md) — ubiquitous language
+- [C4 model](docs/developer/c4-model/) — context / container / component / domain / deployment
+- [User Story Map](docs/product-owner/User-Story-Map.md) — journeys and epics
+
 ## References
 
 Inspired by GitHub & Stripe's WebGL globe implementations.
 
 View live: [https://three-explore-xi.vercel.app/](https://three-explore-xi.vercel.app/)
-
-Globe Preview
