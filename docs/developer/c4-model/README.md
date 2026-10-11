@@ -55,8 +55,8 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 | Layer | Tech |
 | --- | --- |
 | UI | React 19 + react-router-dom |
-| Domain | TypeScript `src/domain/model/`（GeoCoord / FlightRoute / Theme） |
-| Infra | `src/infra/three/`（createGlobe / land / arcs） |
+| Domain | TypeScript `src/domain/model/`（GeoCoord / SpherePoint / FlightRoute / ThemeAppearance） |
+| Infra | `src/infra/three/`（GlobeRoot / FlightArc / LandDotsGroup / createGlobe） |
 | 3D | Three.js + OrbitControls + GLSL |
 | Animation | GSAP |
 | Build | Vite 6 |

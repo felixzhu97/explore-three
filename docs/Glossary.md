@@ -24,9 +24,10 @@ naming. Chinese labels are for localization and stakeholder communication.
 
 | Kind | Rule | Example |
 | --- | --- | --- |
-| Domain type | Noun (what it is) | `GeoCoord`, `FlightRoute`, `Theme` |
-| Method | Verb + noun (what it does) | `projectToVector3`, `createArc` |
-| Infra bootstrap | Verb phrase function | `createGlobe`, `addLandDots` |
+| Domain type | Noun (what it is) | `GeoCoord`, `FlightRoute`, `ThemeAppearance` |
+| Method | Verb + noun (what it does) | `projectToSpherePoint`, `endpoints` |
+| Infra object | Extends `Mesh` / `Group` | `FlightArc`, `GlobeRoot` |
+| Infra bootstrap | Verb phrase function | `createGlobe` |
 | Resource cleanup | Keep Three.js `dispose` | `dispose` |
 
 ### Layers
@@ -35,8 +36,8 @@ naming. Chinese labels are for localization and stakeholder communication.
 components (UI) → infra/three (WebGL) → domain/model
 ```
 
-Domain holds product language only. Three.js scene wiring lives under
-`src/infra/three/`.
+Domain holds product language only — **no** `import 'three'`, no GLSL.
+Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 
 ---
 
@@ -48,7 +49,7 @@ Domain holds product language only. Three.js scene wiring lives under
 | Route | 航线 | `src/domain/model/FlightRoute.ts` | — | OD pairs + `DEFAULT_ROUTES` |
 | Theme | 主题 | `src/domain/model/Theme.ts` | `/`, `/globe-light`, `/globe-dark` | Bright vs tech |
 | Globe (UI) | 地球仪页 | `src/components/` | same routes | React mount |
-| Three infra | 渲染适配 | `src/infra/three/` | — | Non-domain WebGL |
+| Three infra | 渲染适配 | `src/infra/three/` | — | Mesh/Group + materials |
 
 **Frontend route map (canonical)**
 
@@ -63,11 +64,13 @@ Domain holds product language only. Three.js scene wiring lives under
 
 | Preferred Term | 中文 | Definition | Type | Code Mapping |
 | --- | --- | --- | --- | --- |
-| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value Object | `GeoCoord.projectToVector3` |
-| FlightRoute | 航线 | Origin and destination coordinates | Entity | `origin`, `destination` |
+| SpherePoint | 球面点 | Cartesian point on a scaled sphere | Value Object | `SpherePoint` |
+| GeoCoord | 地理坐标 | Latitude (−90..90) and longitude (−180..180) | Value Object | `GeoCoord.projectToSpherePoint` |
+| FlightRoute | 航线 | Origin and destination coordinates | Entity | `FlightRoute.of` |
 | DEFAULT_ROUTES | 默认航线 | Six international city pairs | Constant | `DEFAULT_ROUTES` |
-| ThemeType | 主题类型 | `bright` or `tech` | Union | `ThemeType` |
-| ThemeConfig | 主题配置 | Dot shaders, lights, CTA stroke, source URL | Value Object | `ThemeConfig` |
+| ThemeId | 主题标识 | `bright` or `tech` | Union | `ThemeId` |
+| ThemeAppearance | 主题外观 | Lights, CTA stroke, source URL (no shaders) | Value Object | `ThemeAppearance` |
+| RouteColor | 航线色 | RGB 0..1 route color | Value Object | `RouteColor` |
 | BRIGHT_THEME / TECH_THEME | 亮色 / 科技主题 | Product theme presets | Constant | `Theme.ts` |
 | BRIGHT_COLORS / TECH_COLORS | 航线色板 | Per-route arc colors | Constant | `colors[i % n]` |
 
@@ -77,9 +80,12 @@ Domain holds product language only. Three.js scene wiring lives under
 
 | Name | Path | Role |
 | --- | --- | --- |
-| `createGlobe` | `src/infra/three/createGlobe.ts` | Bootstrap scene, land, arcs, loop, pointer |
-| `addLandDots` | `src/infra/three/land.ts` | Texture → land dot meshes |
-| `createArc` / `createMarker` | `src/infra/three/flyingLine.ts` | Flight arc tube + endpoint marker |
+| `createGlobe` | `src/infra/three/createGlobe.ts` | Scene / Camera / Renderer / Controls / rAF |
+| `GlobeRoot` | `src/infra/three/GlobeRoot.ts` | `Group` — lights, base, dots, arcs, markers |
+| `LandDotsGroup` | `src/infra/three/LandDotsGroup.ts` | `Group` — texture → land dots |
+| `FlightArc` | `src/infra/three/FlightArc.ts` | `Mesh` — animated route tube |
+| `RouteMarker` | `src/infra/three/RouteMarker.ts` | `Mesh` — endpoint disc |
+| materials | `src/infra/three/materials/` | Dot / arc / marker shaders |
 | `defaults` | `src/infra/three/config.ts` | Radii, tube, animation, texture URLs |
 
 ---
@@ -88,12 +94,13 @@ Domain holds product language only. Three.js scene wiring lives under
 
 | Avoid | Prefer | Reason |
 | --- | --- | --- |
-| `Globe` / `GlobeApp` as domain aggregate | `createGlobe` in infra | Bootstrap is not a domain aggregate |
-| `GlobeScene` / `GlobeControls` / `GlobeRenderer` / `GlobePointer` | inline in `createGlobe` | Thin Three.js wrappers |
-| Putting Three factories under `domain/model` | `src/infra/three/` | Domain stays product language |
+| `Globe` / `GlobeApp` as domain aggregate | `GlobeRoot` / `createGlobe` in infra | Bootstrap is not a domain aggregate |
+| `GlobeScene` / `GlobeControls` / `GlobeRenderer` | inline in `createGlobe` | Thin Three.js wrappers |
+| GLSL / `THREE.*` in `domain/model` | `src/infra/three/materials/` | Domain stays product language |
+| `ThemeConfig.dotShader` | `ThemeAppearance` + `DotMaterial` | Shaders are infra |
 | `ColorScheme.createBrightScheme()` | `BRIGHT_COLORS` | Simple constants |
 | `DEFAULT_FLIGHT_ROUTES` | `DEFAULT_ROUTES` | Shorter Preferred Term |
-| `LandMap` / `FlyingLine` classes | `addLandDots` / `createArc` | Verb functions in infra |
+| `addLandDots` / `createArc` factories | `LandDotsGroup` / `FlightArc` | Align with Object3D model |
 | AggregateRoot / DomainService labels on Three helpers | — | Avoid costume DDD |
 
 ---
