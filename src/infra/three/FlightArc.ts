@@ -8,22 +8,11 @@ import {
 	Vector3,
 } from 'three';
 
-import type { FlightRoute, RouteColor } from '../../domain/model';
+import type { FlightRoute } from '../../domain/model/FlightRoute';
+import type { RouteColor } from '../../domain/model/Theme';
 import type { RenderConfig } from './config';
 import { FlightArcMaterial } from './materials/FlightArcMaterial';
-
-function project( lat: number, lon: number, radius: number ): Vector3 {
-
-	const phi = ( 90 - lat ) * ( Math.PI / 180 );
-	const theta = ( lon + 180 ) * ( Math.PI / 180 );
-
-	return new Vector3(
-		- ( radius * Math.sin( phi ) * Math.cos( theta ) ),
-		radius * Math.cos( phi ),
-		radius * Math.sin( phi ) * Math.sin( theta ),
-	);
-
-}
+import { toVector3 } from './sphereVector';
 
 function calculateArcPoints(
 	start: Vector3,
@@ -69,8 +58,8 @@ class FlightArc extends Mesh {
 		idx = 0,
 	) {
 
-		const start = project( route.origin.lat, route.origin.lon, config.sphereRadius );
-		const end = project( route.destination.lat, route.destination.lon, config.sphereRadius );
+		const start = toVector3( route.origin.projectToSpherePoint( config.sphereRadius ) );
+		const end = toVector3( route.destination.projectToSpherePoint( config.sphereRadius ) );
 		const pathPoints = calculateArcPoints( start, end, config, 50 );
 		const curve = new CatmullRomCurve3( pathPoints );
 

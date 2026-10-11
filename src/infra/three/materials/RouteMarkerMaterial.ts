@@ -6,7 +6,7 @@ import {
 	TextureLoader,
 } from 'three';
 
-import type { RouteColor } from '../../../domain/model';
+import type { RouteColor } from '../../../domain/model/Theme';
 
 const vertexShader = /* glsl */ `
 varying vec2 vUv;
