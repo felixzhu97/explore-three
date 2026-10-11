@@ -34,6 +34,10 @@ pnpm start
 - [Glossary](docs/Glossary.md) — ubiquitous language
 - [C4 model](docs/developer/c4-model/) — context / container / component / domain / deployment
 - [User Story Map](docs/product-owner/User-Story-Map.md) — journeys and epics
+- [Contributing](CONTRIBUTING.md) — how to develop and open PRs
+- [Code of Conduct](CODE_OF_CONDUCT.md) — community standards
+- [Security](SECURITY.md) — how to report vulnerabilities
+- [License](LICENSE) — MIT
 
 ## References
 
