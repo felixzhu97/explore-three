@@ -1,7 +1,6 @@
 @startuml C3-Component
 !ROUNDED_STYLE=1
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
-' 样式内联自 style.puml（勿改为 !include）
 UpdateElementStyle("person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("external_person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("system", "#FFFFFF", "#000000", "#000000")
@@ -19,64 +18,61 @@ skinparam shadowing false
 LAYOUT_WITH_LEGEND()
 title [C4 Level 3] Explore Three - 组件图
 
-Container_Boundary(ui, "React UI") {
-    Component(nav, "NavBar", "JSX", "主题路由导航")
-    Component(page_light, "DefaultThemePage", "JSX", "/ 与 /globe-light")
-    Component(page_dark, "DarkThemePage", "JSX", "/globe-dark")
-    Component(globe_view, "Globe", "TSX", "亮色主题挂载")
-    Component(globe_dark, "GlobeDarkTheme", "TSX", "科技主题挂载")
+Container_Boundary(ui, "Angular UI (src/app + src/globe pages)") {
+    Component(nav, "NavbarComponent", "TS", "主题路由导航")
+    Component(page_light, "GlobeLightPageComponent", "TS", "/ 与 /globe-light")
+    Component(page_dark, "GlobeDarkPageComponent", "TS", "/globe-dark")
+    Component(host, "GlobeHostComponent", "TS", "canvas 挂载 + 交互")
 }
 
-Container_Boundary(domain, "Domain Model (src/domain/model)") {
-    Component(sphere, "SpherePoint", "ValueObject", "球面笛卡尔点")
-    Component(geo, "GeoCoord", "ValueObject", "projectToSpherePoint")
-    Component(route, "FlightRoute", "Entity", "origin / destination")
-    Component(routes, "DEFAULT_ROUTES", "Const", "六条默认航线")
-    Component(theme, "ThemeAppearance", "ValueObject", "BRIGHT_THEME / TECH_THEME / RouteColor")
-}
-
-Container_Boundary(infra, "Infra Three (src/infra/three)") {
-    Component(create_globe, "createGlobe", "Function", "Scene / Camera / Renderer / rAF")
-    Component(root, "GlobeRoot", "Group", "灯光 / 球体 / 子对象")
+Container_Boundary(globe, "Globe (src/globe)") {
+    Component(globe_svc, "GlobeService", "Service", "mount / dispose / rAF")
+    Component(globe_group, "GlobeGroup", "Group", "灯光 / 球体 / 子对象")
     Component(land, "LandDotsGroup", "Group", "陆地蒙版 → 点")
+    Component(cfg, "globe.config", "Module", "半径 / tube / 贴图")
+}
+
+Container_Boundary(route_bc, "Route (src/route)") {
+    Component(route_svc, "RouteService", "Service", "FlightRoute / DEFAULT_ROUTES")
     Component(arc, "FlightArc", "Mesh", "飞线 tube")
     Component(marker, "RouteMarker", "Mesh", "端点 disc")
-    Component(mats, "materials", "Module", "Dot / Arc / Marker shaders")
-    Component(cfg, "config defaults", "Module", "半径 / tube / 贴图")
+}
+
+Container_Boundary(theme_bc, "Theme (src/theme)") {
+    Component(theme_svc, "ThemeService", "Service", "ThemeAppearance / RouteColor")
+}
+
+Container_Boundary(geo_bc, "Geography (src/geography)") {
+    Component(geo, "GeoCoord / SpherePoint", "Type", "projectToSpherePoint")
 }
 
 Container_Boundary(ext, "Libraries") {
     Component(threejs, "Three.js", "Library", "WebGL 引擎")
     Component(orbit, "OrbitControls", "Addon", "轨道相机")
     Component(gsap, "GSAP", "Library", "挤出补间")
+    Component(angular, "Angular", "Library", "路由与组件")
 }
 
 Rel(nav, page_light, "导航到亮色")
 Rel(nav, page_dark, "导航到暗色")
-Rel(page_light, globe_view, "渲染")
-Rel(page_dark, globe_dark, "渲染")
-Rel(globe_view, create_globe, "createGlobe + BRIGHT_*")
-Rel(globe_dark, create_globe, "createGlobe + TECH_*")
-Rel(globe_view, theme, "读主题常量")
-Rel(globe_dark, theme, "读主题常量")
-Rel(globe_view, gsap, "u_maxExtrusion tween")
-Rel(globe_dark, gsap, "u_maxExtrusion tween")
-
-Rel(create_globe, root, "new GlobeRoot")
-Rel(root, land, "LandDotsGroup")
-Rel(root, arc, "FlightArc")
-Rel(root, marker, "RouteMarker")
-Rel(root, mats, "shaders")
-Rel(root, cfg, "defaults")
-Rel(root, routes, "DEFAULT_ROUTES")
-Rel(root, theme, "ThemeAppearance")
-Rel(arc, route, "FlightRoute")
-Rel(marker, geo, "GeoCoord")
-Rel(geo, sphere, "SpherePoint")
+Rel(page_light, host, "渲染")
+Rel(page_dark, host, "渲染")
+Rel(host, globe_svc, "mount")
+Rel(host, gsap, "u_maxExtrusion tween")
+Rel(host, theme_svc, "themeId → appearance")
+Rel(globe_svc, globe_group, "new GlobeGroup")
+Rel(globe_svc, route_svc, "defaultRoutes")
+Rel(globe_group, land, "LandDotsGroup")
+Rel(globe_group, arc, "FlightArc")
+Rel(globe_group, marker, "RouteMarker")
+Rel(globe_group, cfg, "globeConfig")
+Rel(arc, geo, "project")
+Rel(marker, geo, "project")
 Rel(land, threejs, "Mesh")
 Rel(arc, threejs, "TubeGeometry")
-Rel(create_globe, threejs, "Scene / rAF")
-Rel(create_globe, orbit, "OrbitControls")
+Rel(globe_svc, threejs, "Scene / rAF")
+Rel(globe_svc, orbit, "OrbitControls")
+Rel(nav, angular, "RouterLink")
 
 SHOW_LEGEND()
 

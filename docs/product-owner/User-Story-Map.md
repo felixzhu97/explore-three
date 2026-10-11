@@ -12,7 +12,7 @@ title: Explore Three - 用户故事地图
 | 角色 | 说明 |
 |------|------|
 | 浏览用户 | 在浏览器中旋转地球、观看飞线与主题切换 |
-| 开发者 | 基于 `src/domain/model` 扩展地球仪可视化 |
+| 开发者 | 基于 `src/{geography,route,theme,globe}` 扩展地球仪可视化 |
 
 ## 旅程总览
 

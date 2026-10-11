@@ -1,7 +1,6 @@
 @startuml C1-Context
 !ROUNDED_STYLE=1
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-' 样式内联自 style.puml（勿改为 !include）
 UpdateElementStyle("person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("external_person", "#FFFFFF", "#000000", "#000000")
 UpdateElementStyle("system", "#FFFFFF", "#000000", "#000000")
@@ -19,26 +18,18 @@ skinparam shadowing false
 LAYOUT_WITH_LEGEND()
 title [C4 Level 1] Explore Three - 系统上下文
 
-Person(browser_user, "Browser User", "在浏览器中查看交互式 3D 地球仪")
-Person(developer, "Developer", "基于源码扩展地球仪可视化")
+Person(user, "Browser User", "浏览交互式地球仪")
 
-System_Boundary(c1, "Explore Three") {
-    System(globe_app, "explore-three", "Vite + React SPA\nThree.js 地球仪与飞线")
+System_Boundary(boundary, "Explore Three") {
+    System(globe_app, "explore-three", "Angular SPA\nThree.js 地球仪与飞线")
 }
 
-System_Ext(ext_browser, "Web Browser", "支持 WebGL 的客户端环境")
-System_Ext(static_assets, "Static Assets", "public/img 纹理与贴图")
-System_Ext(vercel, "Vercel", "生产静态托管与 SPA rewrite")
-System_Ext(github, "GitHub", "源码托管")
+System_Ext(vercel, "Vercel", "静态托管与 CDN")
+System_Ext(assets, "Static Assets", "public/img 纹理")
 
-Rel(browser_user, ext_browser, "打开应用", "HTTPS")
-Rel(browser_user, globe_app, "旋转地球 / 切换主题", "HTTPS")
-Rel(developer, github, "克隆与贡献", "git")
-Rel(developer, globe_app, "本地开发", "pnpm run dev")
-
-Rel(globe_app, ext_browser, "渲染", "WebGL")
-Rel(globe_app, static_assets, "加载纹理", "same-origin")
-Rel(globe_app, vercel, "生产部署", "HTTPS")
+Rel(user, globe_app, "打开主题页、拖拽地球仪", "HTTPS")
+Rel(globe_app, vercel, "部署产物", "CI / CDN")
+Rel(globe_app, assets, "加载陆地蒙版与弧线纹理", "HTTP")
 
 SHOW_LEGEND()
 

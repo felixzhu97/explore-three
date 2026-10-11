@@ -18,7 +18,7 @@
 
 1. **Scenario** 加载默认航线  
    **GIVEN** `DEFAULT_ROUTES` 包含六条城市场景  
-   **WHEN** `createGlobe` 完成引导  
+   **WHEN** `GlobeService.mount` 完成引导  
    **THEN** 每条航线渲染为动画 Tube 飞线  
    **AND** 飞线使用弧线纹理与主题配色
 
