@@ -1,0 +1,47 @@
+@startuml C2-Container
+!ROUNDED_STYLE=1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' 样式内联自 style.puml（勿改为 !include）
+UpdateElementStyle("person", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_person", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("system", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_system", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("container", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_container", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("component", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("external_component", "#FFFFFF", "#000000", "#000000")
+UpdateElementStyle("node", "#FFFFFF", "#000000", "#000000")
+UpdateBoundaryStyle("", $bgColor="#FFFFFF", $fontColor="#000000", $borderColor="#000000")
+UpdateRelStyle("#000000", "#000000")
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+
+LAYOUT_WITH_LEGEND()
+title [C4 Level 2] Explore Three - 容器图
+
+Person(user, "Browser User", "终端用户")
+
+System_Boundary(spa, "Single Page Application") {
+    Container(vite_dev, "Vite Dev Server", "Vite 6", "本地 HMR 与模块服务 :5173")
+    Container(react_app, "Globe App", "React 19 + TypeScript", "路由、主题页、NavBar")
+    Container(domain_model, "Domain Model", "src/domain/model", "Globe 聚合与领域服务")
+    Container(three_renderer, "Three.js Runtime", "Three.js + WebGL", "场景、着色器、飞线网格")
+    Container(animation, "Animation", "GSAP", "拖拽时点挤出补间")
+    Container(webgl_canvas, "WebGL Canvas", "HTML5 Canvas", "帧输出")
+}
+
+ContainerDb(texture_storage, "Texture Storage", "File System", "public/img 陆地蒙版与弧线纹理")
+
+Rel(user, vite_dev, "开发访问", "HTTP :5173")
+Rel(user, react_app, "生产访问", "HTTPS (Vercel)")
+Rel(vite_dev, react_app, "提供模块", "ESM / HMR")
+Rel(react_app, domain_model, "Globe.create", "TS import")
+Rel(react_app, animation, "配置挤出动画", "GSAP")
+Rel(domain_model, three_renderer, "构建场景与材质", "Three.js API")
+Rel(three_renderer, webgl_canvas, "渲染帧", "GPU")
+Rel(domain_model, texture_storage, "加载贴图", "URL fetch")
+Rel(animation, domain_model, "更新 shader uniforms", "callback")
+
+SHOW_LEGEND()
+
+@enduml

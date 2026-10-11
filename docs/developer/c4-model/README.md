@@ -10,25 +10,56 @@ Source of truth: `.puml`。官方 C4: [c4model.com](https://c4model.com/)。库:
 | ----- | ----- | ----- |
 | **Structural C4** | C1–C3, Deployment | [`style.puml`](style.puml) tokens **inlined** after C4 include (white / black) |
 | **Domain model** | `C4-Code-Domain-Model.puml` | `!theme plain` + white/black class skinparam |
-| **Dynamics** | `C4-Dynamic-*` | `!theme plain` sequence (no zinc palette) |
+| **Dynamics** | `C4-Dynamic-*` | `!theme plain` sequence |
 
 ## 文件
 
 | 文件 | 层级 | 说明 |
 | --- | --- | --- |
 | `style.puml` | Shared | Structural white/black tokens（结构图内联，勿 `!include`） |
-| `C4-Code-Domain-Model.puml` | Code | 领域模型（`src/domain/model/`；Glossary Preferred Term） |
-| `C1-Context.puml` | C1 | 系统上下文（后续层补充） |
-| `C2-Container.puml` | C2 | 容器图（后续层补充） |
-| `C3-Component.puml` | C3 | 组件图（后续层补充） |
-| `C4-Deployment.puml` | Deployment | 部署图（后续层补充） |
-| `C4-Dynamic-Globe-Bootstrap.puml` | Dynamic | 地球仪引导序列（后续层补充） |
+| `C1-Context.puml` | C1 | 系统上下文（Browser User、Vercel、Static Assets） |
+| `C2-Container.puml` | C2 | Vite / React / Domain / Three.js / GSAP |
+| `C3-Component.puml` | C3 | **单图**：UI + `src/domain/model` |
+| `C4-Code-Domain-Model.puml` | Code | 领域模型（Glossary Preferred Term） |
+| `C4-Deployment.puml` | Deployment | **单图**：本地 Vite + 生产 Vercel |
+| `C4-Dynamic-Globe-Bootstrap.puml` | Dynamic | 挂载 → 渲染循环 → dispose |
+
+## C1 - 系统上下文图
+
+![C1-Context](png/C1-Context.png)
+
+## C2 - 容器图
+
+![C2-Container](png/C2-Container.png)
+
+## C3 - 组件图
+
+![C3-Component](png/C3-Component.png)
 
 ## Code - 领域模型
 
 ![C4-Code-Domain-Model](png/C4-Code-Domain-Model.png)
 
 按业务域分包（Geography / Route / Theme / Land / Scene）。术语见 [Glossary](../../Glossary.md)。
+
+## C4 - 部署图
+
+![C4-Deployment](png/C4-Deployment.png)
+
+## Dynamic - 地球仪引导
+
+![C4-Dynamic-Globe-Bootstrap](png/C4-Dynamic-Globe-Bootstrap.png)
+
+## 技术栈
+
+| Layer | Tech |
+| --- | --- |
+| UI | React 19 + react-router-dom |
+| Domain | TypeScript `src/domain/model/` |
+| 3D | Three.js + OrbitControls + GLSL |
+| Animation | GSAP |
+| Build | Vite 6 |
+| Deploy | Vercel SPA (`vercel.json` rewrite) |
 
 ## Render
 
@@ -40,3 +71,4 @@ cd docs/developer/c4-model && mkdir -p png && plantuml -tpng -o png *.puml
 
 - [Glossary](../../Glossary.md)
 - [User Story Map](../../product-owner/User-Story-Map.md)
+- [DEPLOYMENT.md](../../DEPLOYMENT.md)
