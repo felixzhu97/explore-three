@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { BRIGHT_THEME, BRIGHT_COLORS } from '../domain/model';
-import { createGlobe, type GlobeHandle } from '../infra/three';
+import { BRIGHT_THEME, BRIGHT_COLORS } from '../domain/model/Theme';
+import { createGlobe, type GlobeHandle } from '../infra/three/createGlobe';
 
 export default function Globe() {
   const containerRef = useRef<HTMLDivElement>(null);

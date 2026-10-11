@@ -28,7 +28,9 @@ naming. Chinese labels are for localization and stakeholder communication.
 | Method | Verb + noun (what it does) | `projectToSpherePoint`, `endpoints` |
 | Infra object | Extends `Mesh` / `Group` | `FlightArc`, `GlobeRoot` |
 | Infra bootstrap | Verb phrase function | `createGlobe` |
+| Infra bridge | Small function (not a base class) | `toVector3` |
 | Resource cleanup | Keep Three.js `dispose` | `dispose` |
+| Barrel `index.ts` | Avoid — import concrete files | `../domain/model/Theme` |
 
 ### Layers
 
@@ -86,6 +88,7 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 | `FlightArc` | `src/infra/three/FlightArc.ts` | `Mesh` — animated route tube |
 | `RouteMarker` | `src/infra/three/RouteMarker.ts` | `Mesh` — endpoint disc |
 | materials | `src/infra/three/materials/` | Dot / arc / marker shaders |
+| `toVector3` | `src/infra/three/sphereVector.ts` | `SpherePoint` → Three `Vector3` |
 | `defaults` | `src/infra/three/config.ts` | Radii, tube, animation, texture URLs |
 
 ---
@@ -101,6 +104,8 @@ Three.js scene objects live under `src/infra/three/` (Mr.doob style).
 | `ColorScheme.createBrightScheme()` | `BRIGHT_COLORS` | Simple constants |
 | `DEFAULT_FLIGHT_ROUTES` | `DEFAULT_ROUTES` | Shorter Preferred Term |
 | `addLandDots` / `createArc` factories | `LandDotsGroup` / `FlightArc` | Align with Object3D model |
+| `DisposableMesh` / shared Mesh base | keep `extends Mesh` / `Group` | Too little shared behavior |
+| `domain/model/index.ts` barrel | `domain/model/Theme.ts` etc. | Prefer concrete modules |
 | AggregateRoot / DomainService labels on Three helpers | — | Avoid costume DDD |
 
 ---

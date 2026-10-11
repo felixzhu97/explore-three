@@ -1,8 +1,10 @@
-import { CircleGeometry, Group, Mesh, Vector3 } from 'three';
+import { CircleGeometry, Group, Mesh } from 'three';
 
-import type { ThemeId } from '../../domain/model';
+import { GeoCoord } from '../../domain/model/GeoCoord';
+import type { ThemeId } from '../../domain/model/Theme';
 import type { RenderConfig } from './config';
 import { DotMaterial } from './materials/DotMaterial';
+import { toVector3 } from './sphereVector';
 
 class LandDotsGroup extends Group {
 
@@ -38,7 +40,7 @@ class LandDotsGroup extends Group {
 					const lon = - 180 + ( x * 360 ) / n;
 					if ( ! this._isOnLand( lon, lat, land ) ) continue;
 
-					const v = this._toVec3( lon, lat, config.sphereRadius );
+					const v = toVector3( new GeoCoord( lat, lon ).projectToSpherePoint( config.sphereRadius ) );
 					const geo = new CircleGeometry( config.dotRadius, config.dotSegments );
 					geo.lookAt( v );
 					geo.translate( v.x, v.y, v.z );
@@ -114,19 +116,6 @@ class LandDotsGroup extends Group {
 		if ( ! land[ lat ]?.length ) return false;
 		const closest = land[ lat ].reduce( ( p, c ) => ( Math.abs( c - lon ) < Math.abs( p - lon ) ? c : p ) );
 		return Math.abs( lon - closest ) < 0.5;
-
-	}
-
-	private _toVec3( lon: number, lat: number, radius: number ): Vector3 {
-
-		const phi = ( 90 - lat ) * ( Math.PI / 180 );
-		const theta = ( lon + 180 ) * ( Math.PI / 180 );
-
-		return new Vector3(
-			- ( radius * Math.sin( phi ) * Math.cos( theta ) ),
-			radius * Math.cos( phi ),
-			radius * Math.sin( phi ) * Math.sin( theta ),
-		);
 
 	}
 

@@ -6,7 +6,7 @@ import {
 	type Texture,
 } from 'three';
 
-import type { RouteColor } from '../../../domain/model';
+import type { RouteColor } from '../../../domain/model/Theme';
 
 const vertexShader = /* glsl */ `
 attribute float progress;

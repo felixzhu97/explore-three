@@ -1,6 +1,6 @@
 import { DoubleSide, ShaderMaterial } from 'three';
 
-import type { ThemeId } from '../../../domain/model';
+import type { ThemeId } from '../../../domain/model/Theme';
 
 const brightVertex = /* glsl */ `
 uniform float u_time;

@@ -9,11 +9,8 @@ import {
 	Vector3,
 } from 'three';
 
-import {
-	DEFAULT_ROUTES,
-	type RouteColor,
-	type ThemeAppearance,
-} from '../../domain/model';
+import { DEFAULT_ROUTES } from '../../domain/model/FlightRoute';
+import type { RouteColor, ThemeAppearance } from '../../domain/model/Theme';
 import { defaults, type RenderConfig } from './config';
 import { FlightArc } from './FlightArc';
 import { LandDotsGroup } from './LandDotsGroup';

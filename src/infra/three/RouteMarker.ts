@@ -1,7 +1,9 @@
-import { Mesh, PlaneGeometry, Vector3 } from 'three';
+import { Mesh, PlaneGeometry } from 'three';
 
-import type { GeoCoord, RouteColor } from '../../domain/model';
+import type { GeoCoord } from '../../domain/model/GeoCoord';
+import type { RouteColor } from '../../domain/model/Theme';
 import { RouteMarkerMaterial } from './materials/RouteMarkerMaterial';
+import { toVector3 } from './sphereVector';
 
 class RouteMarker extends Mesh {
 
@@ -9,14 +11,7 @@ class RouteMarker extends Mesh {
 
 	constructor( coord: GeoCoord, color: RouteColor, radius: number, size = 0.5 ) {
 
-		const phi = ( 90 - coord.lat ) * ( Math.PI / 180 );
-		const theta = ( coord.lon + 180 ) * ( Math.PI / 180 );
-		const position = new Vector3(
-			- ( radius * Math.sin( phi ) * Math.cos( theta ) ),
-			radius * Math.cos( phi ),
-			radius * Math.sin( phi ) * Math.sin( theta ),
-		);
-
+		const position = toVector3( coord.projectToSpherePoint( radius ) );
 		const geometry = new PlaneGeometry( size, size );
 		const material = new RouteMarkerMaterial( color );
 

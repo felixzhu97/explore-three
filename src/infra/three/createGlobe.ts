@@ -8,7 +8,7 @@ import {
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import type { RouteColor, ThemeAppearance } from '../../domain/model';
+import type { RouteColor, ThemeAppearance } from '../../domain/model/Theme';
 import type { RenderConfig } from './config';
 import { GlobeRoot } from './GlobeRoot';
 import type { DotMaterial } from './materials/DotMaterial';
