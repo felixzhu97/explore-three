@@ -1,8 +1,8 @@
 {
-  "name": "threejs-globe",
+  "name": "explore-three",
   "version": "1.0.0",
   "type": "module",
-  "description": "3D Globe with flying lines using Three.js and React",
+  "description": "An interactive 3D globe visualization built with Three.js, featuring a twinkling star effect and animated flying lines connecting global locations.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

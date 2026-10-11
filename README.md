@@ -1,6 +1,8 @@
-# Three.js Globe
+# Explore Three
 
 An interactive 3D globe visualization built with Three.js, featuring a twinkling star effect and animated flying lines connecting global locations.
+
+Package / repo: `explore-three`.
 
 ## Features
 
@@ -18,8 +20,8 @@ An interactive 3D globe visualization built with Three.js, featuring a twinkling
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## References

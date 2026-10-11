@@ -3,13 +3,13 @@
 
 LAYOUT_WITH_LEGEND()
 
-title System Context Diagram - threejs-globe
+title System Context Diagram - Explore Three
 
 Person(browser_user, "Browser User", "Views 3D globe visualization")
 Person(developer, "Developer", "Uses components to build 3D globe apps")
 
-System_Boundary(c1, "threejs-globe System") {
-    System(globe_app, "threejs-globe", "3D Globe with flying routes")
+System_Boundary(c1, "Explore Three System") {
+    System(globe_app, "explore-three", "3D Globe with flying routes")
 }
 
 System_Ext(ext_browser, "Web Browser", "Client environment with WebGL support")
