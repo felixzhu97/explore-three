@@ -37,7 +37,7 @@ pnpm start
 - [Contributing](CONTRIBUTING.md) — how to develop and open PRs
 - [Code of Conduct](CODE_OF_CONDUCT.md) — community standards
 - [Security](SECURITY.md) — how to report vulnerabilities
-- [License](LICENSE) — MIT
+- [License](LICENSE) — Apache-2.0
 
 ## References
 
